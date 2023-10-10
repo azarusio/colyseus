@@ -8,7 +8,7 @@ import { ServerOpts, Socket } from "net";
 export const REMOTE_ROOM_SHORT_TIMEOUT = Number(process.env.COLYSEUS_PRESENCE_SHORT_TIMEOUT || 2000);
 
 export function generateId(length: number = 9) {
-  return nanoid(length);
+  return process.env.PROCESS_ID || nanoid(length);
 }
 
 //

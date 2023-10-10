@@ -46,5 +46,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "c45b410e99eadffff4b74e701339992e2faa15f8"
+  "gitHead": "c45b410e99eadffff4b74e701339992e2faa15f8",
+  "devDependencies": {
+    "@types/nanoid": "^3.0.0"
+  }
 }

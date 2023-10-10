@@ -2,8 +2,8 @@ import { ErrorCode, Protocol } from './Protocol';
 
 import { requestFromIPC, subscribeIPC } from './IPC';
 
+import { cacheRoomHistory, getPreviousProcessId, getRoomRestoreListKey, isDevMode, reloadFromCache } from './utils/DevMode';
 import { Deferred, generateId, merge, REMOTE_ROOM_SHORT_TIMEOUT, retry } from './utils/Utils';
-import { isDevMode, cacheRoomHistory, getPreviousProcessId, getRoomRestoreListKey, reloadFromCache } from './utils/DevMode';
 
 import { RegisteredHandler } from './matchmaker/RegisteredHandler';
 import { Room, RoomInternalState } from './Room';
@@ -15,13 +15,13 @@ import { debugAndPrintError, debugMatchMaking } from './Debug';
 import { SeatReservationError } from './errors/SeatReservationError';
 import { ServerError } from './errors/ServerError';
 
-import { IRoomListingData, MatchMakerDriver, RoomListingData, LocalDriver } from './matchmaker/driver';
 import controller from './matchmaker/controller';
+import { IRoomListingData, LocalDriver, MatchMakerDriver, RoomListingData } from './matchmaker/driver';
 
+import { getHostname } from './discovery';
 import { logger } from './Logger';
 import { Client } from './Transport';
 import { Type } from './types';
-import { getHostname } from "./discovery";
 
 export { MatchMakerDriver, controller };
 
@@ -313,9 +313,9 @@ export async function createRoom(roomName: string, clientOptions: ClientOptions)
 
   if (isDevMode) {
     presence.hset(getRoomRestoreListKey(), room.roomId, JSON.stringify({
-      "clientOptions": clientOptions,
-      "roomName": roomName,
-      "processId": processId
+      clientOptions,
+      processId,
+      roomName,
     }));
   }
 
@@ -353,7 +353,7 @@ export async function handleCreateRoom(roomName: string, clientOptions: ClientOp
   room.listing = driver.createInstance({
     name: roomName,
     processId,
-    ...additionalListingData
+    ...additionalListingData,
   });
 
   if (room.onCreate) {
@@ -372,7 +372,7 @@ export async function handleCreateRoom(roomName: string, clientOptions: ClientOp
     }
   }
 
-  room['_internalState'] = RoomInternalState.CREATED;
+  room._internalState = RoomInternalState.CREATED;
 
   room.listing.roomId = room.roomId;
   room.listing.maxClients = room.maxClients;
@@ -436,7 +436,7 @@ export async function gracefullyShutdown(): Promise<any> {
   return Promise.all(disconnectAll(
     (isDevMode)
       ? Protocol.WS_CLOSE_DEVMODE_RESTART
-      : undefined
+      : undefined,
   ));
 }
 
@@ -615,5 +615,5 @@ function getProcessChannel(id: string = processId) {
 }
 
 function getGlobalCCUCounter() {
-  return "_ccu";
+  return '_ccu';
 }
