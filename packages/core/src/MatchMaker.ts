@@ -44,6 +44,8 @@ export let driver: MatchMakerDriver;
 export let isGracefullyShuttingDown: boolean;
 export let onReady: Deferred;
 
+export let roomCount = 0;
+
 export async function setup(
   _presence?: Presence,
   _driver?: MatchMakerDriver,
@@ -69,7 +71,7 @@ export async function setup(
     return handleCreateRoom.apply(undefined, args);
   });
 
-  await presence.hset(getRoomCountKey(), processId, '0');
+  await presence.hset(getRoomCountKey(), processId, roomCount.toString());
 
   if (isDevMode) {
     await reloadFromCache();
@@ -361,8 +363,8 @@ export async function handleCreateRoom(roomName: string, clientOptions: ClientOp
       await room.onCreate(merge({}, clientOptions, registeredHandler.options));
 
       // increment amount of rooms this process is handling
-      presence.hincrby(getRoomCountKey(), processId, 1);
-
+      roomCount++;
+      presence.hset(getRoomCountKey(), processId, roomCount.toString());
     } catch (e) {
       debugAndPrintError(e);
       throw new ServerError(
@@ -520,8 +522,13 @@ async function awaitRoomAvailable(roomToJoin: string, callback: Function): Promi
     const concurrencyKey = getHandlerConcurrencyKey(roomToJoin);
     const concurrency = await presence.incr(concurrencyKey) - 1;
 
+    //
     // avoid having too long timeout if 10+ clients ask to join at the same time
-    const concurrencyTimeout = Math.min(concurrency * 100, REMOTE_ROOM_SHORT_TIMEOUT);
+    //
+    // TODO: we need a better solution here. either a lock or queue system should be implemented instead.
+    // https://github.com/colyseus/colyseus/issues/466
+    //
+    const concurrencyTimeout = Math.min(concurrency * 100, 500);
 
     if (concurrency > 0) {
       debugMatchMaking(
@@ -574,7 +581,8 @@ async function disposeRoom(roomName: string, room: Room) {
 
   // decrease amount of rooms this process is handling
   if (!isGracefullyShuttingDown) {
-    presence.hincrby(getRoomCountKey(), processId, -1);
+    roomCount--;
+    presence.hset(getRoomCountKey(), processId, roomCount.toString());
 
     // remove from devMode restore list
     if (isDevMode) {
