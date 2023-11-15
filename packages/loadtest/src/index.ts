@@ -397,6 +397,7 @@ Example:
     }
 
     async function connectAll(main: MainCallback) {
+        BPromise.map([], {concurrency: 500});
         for (let i = 0; i < options.numClients; i++) {
             await connect(main, i);
 

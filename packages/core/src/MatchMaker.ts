@@ -58,7 +58,7 @@ export async function setup(
   if (isDevMode) { processId = await getPreviousProcessId(await getHostname()); }
 
   // ensure processId is set
-  if (!processId) { processId = generateId(); }
+  if (!processId) { processId = process.env.PROCESS_ID || generateId(); }
 
   isGracefullyShuttingDown = false;
 
@@ -276,7 +276,7 @@ export async function createRoom(roomName: string, clientOptions: ClientOptions)
 
   const processIdWithFewerRooms = (
     Object.keys(roomsSpawnedByProcessId).sort((p1, p2) => {
-      return (Number(roomsSpawnedByProcessId[p1]) > Number(roomsSpawnedByProcessId[p2]))
+      return (Number(roomsSpawnedByProcessId[p1]) >= Number(roomsSpawnedByProcessId[p2]))
         ? 1
         : -1;
     })[0]
@@ -603,7 +603,7 @@ export function getRoomCountKey() {
 }
 
 function getRoomChannel(roomId: string) {
-  return `$${roomId}`;
+  return `r:${roomId}`;
 }
 
 function getHandlerConcurrencyKey(name: string) {

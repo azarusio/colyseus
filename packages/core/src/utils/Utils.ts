@@ -11,7 +11,7 @@ import { Schema } from "@colyseus/schema";
 export const REMOTE_ROOM_SHORT_TIMEOUT = Number(process.env.COLYSEUS_PRESENCE_SHORT_TIMEOUT || 500);
 
 export function generateId(length: number = 9) {
-  return process.env.PROCESS_ID || nanoid(length);
+  return nanoid(length);
 }
 
 //

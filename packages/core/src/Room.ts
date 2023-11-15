@@ -690,7 +690,7 @@ export abstract class Room<State extends object= any, Metadata= any> {
     }, timeoutInSeconds * 1000);
   }
 
-  private broadcastMessageSchema<T extends Schema>(message: T, options: IBroadcastOptions = {}) {
+  protected broadcastMessageSchema<T extends Schema>(message: T, options: IBroadcastOptions = {}) {
     debugMessage("broadcast: %O", message);
     const encodedMessage = getMessageBytes[Protocol.ROOM_DATA_SCHEMA](message);
     const except = (typeof (options.except) !== "undefined")
@@ -709,7 +709,7 @@ export abstract class Room<State extends object= any, Metadata= any> {
     }
   }
 
-  private broadcastMessageType(type: string, message?: any, options: IBroadcastOptions = {}) {
+  protected broadcastMessageType(type: string, message?: any, options: IBroadcastOptions = {}) {
     debugMessage("broadcast: %O", message);
     const encodedMessage = getMessageBytes.raw(Protocol.ROOM_DATA, type, message);
     const except = (typeof (options.except) !== "undefined")
