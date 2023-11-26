@@ -1,0 +1,11 @@
+{
+    "isRebasing": true,
+    "patches": [
+        {
+            "didApply": false,
+            "patchContentHash": "4241cef99206273b6892b7722bdf141c264c78f4b73b8cf359e113ef35884960",
+            "patchFilename": "@colyseus+core+0.15.8.patch"
+        }
+    ],
+    "version": 1
+}

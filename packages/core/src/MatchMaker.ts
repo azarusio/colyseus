@@ -430,7 +430,7 @@ export async function gracefullyShutdown(): Promise<any> {
   }
 
   // remove processId from room count key
-  presence.hdel(getRoomCountKey(), processId);
+  await presence.hdel(getRoomCountKey(), processId);
 
   // unsubscribe from process id channel
   presence.unsubscribe(getProcessChannel());
