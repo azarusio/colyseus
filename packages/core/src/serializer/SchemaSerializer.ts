@@ -11,10 +11,10 @@ import { ClientState } from '../Transport';
 export class SchemaSerializer<T> implements Serializer<T> {
   public id = 'schema';
 
-  private state: T & Schema;
-  private useFilters: boolean = false;
+  protected state: T & Schema;
+  protected useFilters: boolean = false;
 
-  private handshakeCache: number[];
+  protected handshakeCache: number[];
 
   public reset(newState: T & Schema) {
     this.state = newState;

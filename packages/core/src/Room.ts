@@ -130,7 +130,7 @@ export abstract class Room<State extends object= any, Metadata= any> {
 
   private onMessageHandlers: {[id: string]: (client: Client, message: any) => void} = {};
 
-  private _serializer: Serializer<State> = noneSerializer;
+  protected _serializer: Serializer<State> = noneSerializer;
   private _afterNextPatchQueue: Array<[string | Client, IArguments]> = [];
 
   private _simulationInterval: NodeJS.Timer;
